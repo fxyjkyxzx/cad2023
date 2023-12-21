@@ -290,11 +290,281 @@ doc["threejsblock"].bind("click", threejsblock.do)
 <h1>網站</h1>
 <p><a href="https://s1511.cycu.org:8129">https://s1511.cycu.org:8129</a></p>
 <h1>Home Work</h1>
-<h2>零件繪製</h2>
+<h2>說明如何利用chat列出各組學員座位表</h2>
+<p>先詢問了GPT如何寫學員座位表得到的回覆如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import random
+
+# 學員信息
+students = [
+    {"name": "學員1", "id": "001"},
+    {"name": "學員2", "id": "002"},
+    {"name": "學員3", "id": "003"},
+    # 添加更多學員信息
+]
+
+# 座位布局
+num_rows = 4
+num_cols = 5
+
+# 隨機排序學員順序
+random.shuffle(students)
+
+# 初始化座位表
+seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+# 分配座位
+for i in range(num_rows):
+    for j in range(num_cols):
+        if students:
+            student = students.pop()
+            seating_arrangement[i][j] = f"{student['name']} ({student['id']})"
+        else:
+            break
+
+# 打印座位表
+for row in seating_arrangement:
+    print(row)</pre>
+<p>已經有學員訊息所以我問他我如何把訊息導入</p>
+<p>我得到的回覆如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import requests
+from bs4 import BeautifulSoup
+import random
+
+# 獲取網頁內容
+url = "你的網址"
+response = requests.get(url)
+
+# 檢查請求是否成功
+if response.status_code == 200:
+    # 使用 BeautifulSoup 解析網頁內容
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # 從網頁中提取學員資訊，這部分需要根據網頁結構進行適當的修改
+    student_elements = soup.find_all('div', class_='student-info')
+    
+    # 存儲學員資訊的列表
+    students = []
+    
+    for student_element in student_elements:
+        # 解析每個學員資訊的部分，這部分也需要根據網頁結構進行適當的修改
+        name = student_element.find('span', class_='name').text
+        student_id = student_element.find('span', class_='id').text
+        
+        # 將學員資訊添加到列表中
+        students.append({"name": name, "id": student_id})
+
+    # 座位布局
+    num_rows = 4
+    num_cols = 5
+
+    # 隨機排序學員順序
+    random.shuffle(students)
+
+    # 初始化座位表
+    seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+    # 分配座位
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if students:
+                student = students.pop()
+                seating_arrangement[i][j] = f"{student['name']} ({student['id']})"
+            else:
+                break
+
+    # 打印座位表
+    for row in seating_arrangement:
+        print(row)
+else:
+    print(f"無法獲取網址內容。狀態碼: {response.status_code}")</pre>
+<p>把網頁帶入執行後出現錯誤因此我再去問GPT得到的修正結果如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import requests
+import random
+
+你的程式碼中使用了 requests.get(url) 來獲取網頁內容，但似乎該網址返回的是文本檔 (txt 檔案)，而不是 HTML。因此，使用 BeautifulSoup 解析文本檔時，不需要使用 'html.parser'
+
+# 獲取文本檔內容
+url = "https://mde.tw/cadnote/downloads/2a_w12_seat.txt"
+response = requests.get(url)
+
+# 檢查請求是否成功
+if response.status_code == 200:
+    # 將文本內容按行分割
+    lines = response.text.splitlines()
+
+    # 存儲學員資訊的列表
+    students = []
+
+    # Process each line of the file content
+    for line in lines:
+        # Split each line using tabs
+        elements = line.split("\t")
+
+        # If the line contains seat information
+        if len(elements) == 2 and "(" in elements[1]:
+            # Extract student number and seat information
+            stud_num = elements[0].strip()
+            seat_info = elements[1].strip()
+
+            # Add student number and seat information to the list
+            students.append({"name": f"座位號: {seat_info}", "id": f"學號: {stud_num}"})
+
+    # 座位布局
+    num_rows = 4
+    num_cols = 5
+
+    # 隨機排序學員順序
+    random.shuffle(students)
+
+    # 初始化座位表
+    seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+    # 分配座位
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if students:
+                student = students.pop()
+                seating_arrangement[i][j] = f"{student['name']}, {student['id']}"
+            else:
+                break
+
+    # 打印座位表
+    for row in seating_arrangement:
+        print(row)
+else:
+    print(f"無法獲取網址內容。狀態碼: {response.status_code}")</pre>
+<p></p>
+<p>接著我想把文件裡面的座位座標直接導入</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import random
+
+# Replace this line with the actual file content
+file_content = """
+學號1\t座位1
+學號2\t座位2
+學號3\t座位3
+"""
+
+# 存儲學員資訊的列表
+students = []
+
+# Process each line of the file content
+for line in file_content.splitlines():
+    # Split each line using tabs
+    elements = line.split("\t")
+
+    # If the line contains seat information
+    if len(elements) == 2:
+        # Extract student number and seat information
+        stud_num = elements[0].strip()
+        seat_info = elements[1].strip()
+
+        # Add student number and seat information to the list
+        students.append({"name": f"座位號: {seat_info}", "id": f"學號: {stud_num}"})
+
+# 座位布局
+num_rows = 4
+num_cols = 5
+
+# 隨機排序學員順序
+random.shuffle(students)
+
+# 初始化座位表
+seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+# 分配座位
+for i in range(num_rows):
+    for j in range(num_cols):
+        if students:
+            student = students.pop()
+            seating_arrangement[i][j] = f"{student['name']}, {student['id']}"
+        else:
+            break
+
+# 打印座位表
+for row in seating_arrangement:
+    print(row)</pre>
+<p><span style="background-color: #ff0000;">接下來開始漫長的debug</span></p>
+<h3>問題總結</h3>
+<p>1.後面發現因為是網頁執行程式</p>
+<div class="line number6 index5 alt1"><code class="html plain">url = "你的網址"</code></div>
+<div class="line number7 index6 alt2"><code class="html plain">response = requests.get(url)</code></div>
+<div class="line number7 index6 alt2"> </div>
+<div class="line number7 index6 alt2">所以上面代碼要換成下面的才能訪問及操作網站裡面的信息</div>
+<div class="line number7 index6 alt2"></div>
+<div class="line number7 index6 alt2"># get output html location<br/>brython_div = document["brython_div1"]<br/>brython_div &lt;= html.P(id="output_table")</div>
+<div class="line number7 index6 alt2"></div>
+<div class="line number7 index6 alt2">2.作業環境也要跟GPT說好不然會因環境不同產生一堆錯誤</div>
+<div class="line number7 index6 alt2"></div>
+<div class="line number7 index6 alt2"></div>
+<div class="line number7 index6 alt2">3.<span>在你提供的Brython代碼中，缺少 </span><code>brython_div</code><span> 的定義，這導致 </span><code>document["brython_div1"]</code><span> 的錯誤。</span></div><h3>成品及附上說明</h3>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false"># Brython code starts
+from browser import document, html
+
+# 獲取輸出HTML的位置
+brython_div = document["brython_div1"]
+brython_div &lt;= html.P(id="output_table")
+
+# 替換這行程式碼，使用實際的檔案內容
+file_content = open("https://mde.tw/cadnote/downloads/2a_w12_seat.txt").read()
+
+# 創建一個字典來存儲學號和座位號
+seat_map = {}
+
+# 處理檔案內容的每一行
+for line in file_content.splitlines():
+    # 使用tab分割每一行
+    elements = line.split("\t")
+
+    # 如果該行包含座位信息
+    if len(elements) == 2 and "(" in elements[1]:
+        # 提取學號和座位信息
+        stud_num = elements[0].strip()
+        seat_info = elements[1].strip()
+
+        # 將學號和座位信息添加到字典中
+        seat_map[stud_num] = seat_info
+
+# 檢查 seat_map 是否為空
+if not seat_map:
+    # 如果未找到座位信息，顯示消息
+    document["output_table"].html = "&lt;p&gt;找不到座位信息。&lt;/p&gt;"
+else:
+    # 查找最大的行和列值
+    max_row = max(int(seat_info[1]) for seat_info in seat_map.values())
+    max_col = max(int(seat_info[3]) for seat_info in seat_map.values())
+
+    # 初始化二維列表來表示座位安排
+    seating_arrangement = [["空位"] * max_col for _ in range(max_row)]
+
+    # 使用學號和座位信息填充座位安排
+    for stud_num, seat_info in seat_map.items():
+        row = int(seat_info[1]) - 1
+        col = int(seat_info[3]) - 1
+        seating_arrangement[row][col] = f"座位號: {seat_info}, 學號: {stud_num}"
+
+    # 在HTML文檔中顯示結果
+    result_html = "&lt;table&gt;"
+    for row in seating_arrangement:
+        result_html += "&lt;tr&gt;"
+        for cell_content in row:
+            result_html += f"&lt;td&gt;{cell_content}&lt;/td&gt;"
+        result_html += "&lt;/tr&gt;"
+    result_html += "&lt;/table&gt;"
+
+    # 使用結果更新HTML內容
+    document["output_table"].html = result_html
+# Brython code ends</pre>
+<p></p>
+<p></p><h2>零件繪製</h2>
 <h3>組合圖</h3>
-<p><img alt="" height="602" src="/images/組合圖.png" width="800"/></p><h3>滑軌</h3>
-<p><img alt="" height="639" src="/images/滑軌.png" width="800"/></p><h3>底座</h3>
-<p><img alt="" height="463" src="/images/底座.png" width="800"/></p><h3>接球的碗</h3>
-<p><img alt="" height="633" src="/images/碗.png" width="792"/></p><h3>支撐柱</h3>
-<p><img alt="" height="765" src="/images/未命名.png" width="674"/></p><h3>固定座</h3>
+<p><img alt="" height="602" src="/images/組合圖.png" width="800"/></p>
+<h3>滑軌</h3>
+<p><img alt="" height="639" src="/images/滑軌.png" width="800"/></p>
+<h3>底座</h3>
+<p><img alt="" height="463" src="/images/底座.png" width="800"/></p>
+<h3>接球的碗</h3>
+<p><img alt="" height="633" src="/images/碗.png" width="792"/></p>
+<h3>支撐柱</h3>
+<p><img alt="" height="765" src="/images/未命名.png" width="674"/></p>
+<h3>固定座</h3>
 <p><img alt="" height="613" src="/images/固定座.png" width="689"/></p>

@@ -2,7 +2,7 @@
         <head>
         <title>cmsite</title>
         <meta charset="utf-8">
-<meta property="head" content="H2">
+<meta property="head" content="H3">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link href="https://fonts.googleapis.com/css?family=Quicksand:300,400,500,700,900" rel="stylesheet">
         <link rel="stylesheet" href="./../cmsimde/static/chimper/fonts/icomoon/style.css">
@@ -142,8 +142,66 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">成品及附上說明 << <a href='成品及附上說明.html'>Previous</a> <a href='組合圖.html'>Next</a> >> 組合圖<br /><h1>零件繪製</h1>
-<br />成品及附上說明 << <a href='成品及附上說明.html'>Previous</a> <a href='組合圖.html'>Next</a> >> 組合圖</div>
+    <div id="tipue_search_content">問題總結 << <a href='問題總結.html'>Previous</a> <a href='零件繪製.html'>Next</a> >> 零件繪製<br /><h1>成品及附上說明</h1>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false"># Brython code starts
+from browser import document, html
+
+# 獲取輸出HTML的位置
+brython_div = document["brython_div1"]
+brython_div &lt;= html.P(id="output_table")
+
+# 替換這行程式碼，使用實際的檔案內容
+file_content = open("https://mde.tw/cadnote/downloads/2a_w12_seat.txt").read()
+
+# 創建一個字典來存儲學號和座位號
+seat_map = {}
+
+# 處理檔案內容的每一行
+for line in file_content.splitlines():
+    # 使用tab分割每一行
+    elements = line.split("\t")
+
+    # 如果該行包含座位信息
+    if len(elements) == 2 and "(" in elements[1]:
+        # 提取學號和座位信息
+        stud_num = elements[0].strip()
+        seat_info = elements[1].strip()
+
+        # 將學號和座位信息添加到字典中
+        seat_map[stud_num] = seat_info
+
+# 檢查 seat_map 是否為空
+if not seat_map:
+    # 如果未找到座位信息，顯示消息
+    document["output_table"].html = "&lt;p&gt;找不到座位信息。&lt;/p&gt;"
+else:
+    # 查找最大的行和列值
+    max_row = max(int(seat_info[1]) for seat_info in seat_map.values())
+    max_col = max(int(seat_info[3]) for seat_info in seat_map.values())
+
+    # 初始化二維列表來表示座位安排
+    seating_arrangement = [["空位"] * max_col for _ in range(max_row)]
+
+    # 使用學號和座位信息填充座位安排
+    for stud_num, seat_info in seat_map.items():
+        row = int(seat_info[1]) - 1
+        col = int(seat_info[3]) - 1
+        seating_arrangement[row][col] = f"座位號: {seat_info}, 學號: {stud_num}"
+
+    # 在HTML文檔中顯示結果
+    result_html = "&lt;table&gt;"
+    for row in seating_arrangement:
+        result_html += "&lt;tr&gt;"
+        for cell_content in row:
+            result_html += f"&lt;td&gt;{cell_content}&lt;/td&gt;"
+        result_html += "&lt;/tr&gt;"
+    result_html += "&lt;/table&gt;"
+
+    # 使用結果更新HTML內容
+    document["output_table"].html = result_html
+# Brython code ends</pre>
+<p></p>
+<p></p><br />問題總結 << <a href='問題總結.html'>Previous</a> <a href='零件繪製.html'>Next</a> >> 零件繪製</div>
         
     <!-- footer -->
       <div class="container">

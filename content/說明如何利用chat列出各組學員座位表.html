@@ -142,8 +142,201 @@ img.add_border {
           </div>
           
         </header>
-    <div id="tipue_search_content">成品及附上說明 << <a href='成品及附上說明.html'>Previous</a> <a href='組合圖.html'>Next</a> >> 組合圖<br /><h1>零件繪製</h1>
-<br />成品及附上說明 << <a href='成品及附上說明.html'>Previous</a> <a href='組合圖.html'>Next</a> >> 組合圖</div>
+    <div id="tipue_search_content">Home Work << <a href='Home Work.html'>Previous</a> <a href='問題總結.html'>Next</a> >> 問題總結<br /><h1>說明如何利用chat列出各組學員座位表</h1>
+<p>先詢問了GPT如何寫學員座位表得到的回覆如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import random
+
+# 學員信息
+students = [
+    {"name": "學員1", "id": "001"},
+    {"name": "學員2", "id": "002"},
+    {"name": "學員3", "id": "003"},
+    # 添加更多學員信息
+]
+
+# 座位布局
+num_rows = 4
+num_cols = 5
+
+# 隨機排序學員順序
+random.shuffle(students)
+
+# 初始化座位表
+seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+# 分配座位
+for i in range(num_rows):
+    for j in range(num_cols):
+        if students:
+            student = students.pop()
+            seating_arrangement[i][j] = f"{student['name']} ({student['id']})"
+        else:
+            break
+
+# 打印座位表
+for row in seating_arrangement:
+    print(row)</pre>
+<p>已經有學員訊息所以我問他我如何把訊息導入</p>
+<p>我得到的回覆如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import requests
+from bs4 import BeautifulSoup
+import random
+
+# 獲取網頁內容
+url = "你的網址"
+response = requests.get(url)
+
+# 檢查請求是否成功
+if response.status_code == 200:
+    # 使用 BeautifulSoup 解析網頁內容
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # 從網頁中提取學員資訊，這部分需要根據網頁結構進行適當的修改
+    student_elements = soup.find_all('div', class_='student-info')
+    
+    # 存儲學員資訊的列表
+    students = []
+    
+    for student_element in student_elements:
+        # 解析每個學員資訊的部分，這部分也需要根據網頁結構進行適當的修改
+        name = student_element.find('span', class_='name').text
+        student_id = student_element.find('span', class_='id').text
+        
+        # 將學員資訊添加到列表中
+        students.append({"name": name, "id": student_id})
+
+    # 座位布局
+    num_rows = 4
+    num_cols = 5
+
+    # 隨機排序學員順序
+    random.shuffle(students)
+
+    # 初始化座位表
+    seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+    # 分配座位
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if students:
+                student = students.pop()
+                seating_arrangement[i][j] = f"{student['name']} ({student['id']})"
+            else:
+                break
+
+    # 打印座位表
+    for row in seating_arrangement:
+        print(row)
+else:
+    print(f"無法獲取網址內容。狀態碼: {response.status_code}")</pre>
+<p>把網頁帶入執行後出現錯誤因此我再去問GPT得到的修正結果如下</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import requests
+import random
+
+你的程式碼中使用了 requests.get(url) 來獲取網頁內容，但似乎該網址返回的是文本檔 (txt 檔案)，而不是 HTML。因此，使用 BeautifulSoup 解析文本檔時，不需要使用 'html.parser'
+
+# 獲取文本檔內容
+url = "https://mde.tw/cadnote/downloads/2a_w12_seat.txt"
+response = requests.get(url)
+
+# 檢查請求是否成功
+if response.status_code == 200:
+    # 將文本內容按行分割
+    lines = response.text.splitlines()
+
+    # 存儲學員資訊的列表
+    students = []
+
+    # Process each line of the file content
+    for line in lines:
+        # Split each line using tabs
+        elements = line.split("\t")
+
+        # If the line contains seat information
+        if len(elements) == 2 and "(" in elements[1]:
+            # Extract student number and seat information
+            stud_num = elements[0].strip()
+            seat_info = elements[1].strip()
+
+            # Add student number and seat information to the list
+            students.append({"name": f"座位號: {seat_info}", "id": f"學號: {stud_num}"})
+
+    # 座位布局
+    num_rows = 4
+    num_cols = 5
+
+    # 隨機排序學員順序
+    random.shuffle(students)
+
+    # 初始化座位表
+    seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+    # 分配座位
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if students:
+                student = students.pop()
+                seating_arrangement[i][j] = f"{student['name']}, {student['id']}"
+            else:
+                break
+
+    # 打印座位表
+    for row in seating_arrangement:
+        print(row)
+else:
+    print(f"無法獲取網址內容。狀態碼: {response.status_code}")</pre>
+<p></p>
+<p>接著我想把文件裡面的座位座標直接導入</p>
+<pre class="brush:html;auto-links:false;toolbar:false" contenteditable="false">import random
+
+# Replace this line with the actual file content
+file_content = """
+學號1\t座位1
+學號2\t座位2
+學號3\t座位3
+"""
+
+# 存儲學員資訊的列表
+students = []
+
+# Process each line of the file content
+for line in file_content.splitlines():
+    # Split each line using tabs
+    elements = line.split("\t")
+
+    # If the line contains seat information
+    if len(elements) == 2:
+        # Extract student number and seat information
+        stud_num = elements[0].strip()
+        seat_info = elements[1].strip()
+
+        # Add student number and seat information to the list
+        students.append({"name": f"座位號: {seat_info}", "id": f"學號: {stud_num}"})
+
+# 座位布局
+num_rows = 4
+num_cols = 5
+
+# 隨機排序學員順序
+random.shuffle(students)
+
+# 初始化座位表
+seating_arrangement = [["空位"] * num_cols for _ in range(num_rows)]
+
+# 分配座位
+for i in range(num_rows):
+    for j in range(num_cols):
+        if students:
+            student = students.pop()
+            seating_arrangement[i][j] = f"{student['name']}, {student['id']}"
+        else:
+            break
+
+# 打印座位表
+for row in seating_arrangement:
+    print(row)</pre>
+<p><span style="background-color: #ff0000;">接下來開始漫長的debug</span></p>
+<br />Home Work << <a href='Home Work.html'>Previous</a> <a href='問題總結.html'>Next</a> >> 問題總結</div>
         
     <!-- footer -->
       <div class="container">
